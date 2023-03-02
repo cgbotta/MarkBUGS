@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="TaskPaneApp">
+  <!--IMPORTANT! Id must be unique for each add-in. If you copy this manifest ensure that you change this id to your own GUID. -->
+  <Id>95cb5dee-9f70-45ec-9562-b7d321dc8790</Id>
+  <Version>1.0</Version>
+  <ProviderName>Cambridge CBL</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="ExcelBUGS" />
+  <Description DefaultValue="Write BUGS programs in Excel"/>
+  <SupportUrl DefaultValue="[Insert the URL of a page that provides support information for the app]" />
+  <AppDomains>
+    <AppDomain>https://www.northwindtraders.com</AppDomain>
+  </AppDomains>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://develop--celadon-pudding-eefe11.netlify.app/edit#pako:eNpVjk9rg0AQxb_KMqcWNPgnatlDodE2l0ALzamaw6BrVhJ3ZV1JrfrduyqBdk4z7_3eYwbIZcGAQnmVt5yj0uSYZIKYeUljrqpW19ieiG0_j3umSS0F60eye9hL0nLZNJU4P678boZIPBxmjBHNK3GZVite8u-CjSRJD9ho2Zz-OsebHMlrWn1wU__f4YqZ1FtaIi3RzlGRGNWCgAU1UzVWhXl_mJUMNGc1y4CatUB1ySATk-Gw0_KzFzlQrTpmQdcUqFlS4VlhfRcbFF9SmrPEa7veQAf4Bup70SZwvDDwPSdwI8e3oAdqh-7Gdb3gaetHfhBuw2iy4GdpcKdfNytpnA" />
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>

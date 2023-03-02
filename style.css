@@ -1,0 +1,23 @@
+[labelFor='#graph-definition'] {
+  background: #ddd;
+  border: 1px dashed #bbb;
+  color: #555;
+  font-weight: bold;
+  padding: 5px 10px;
+}
+
+[labelFor='#graph-definition'].error {
+  background: #fdd;
+  border: 1px dashed #cbb;
+  color: #833;
+}
+
+[labelFor='#graph-definition'].ok {
+  background: #dfd;
+  border: 1px dashed #bcb;
+  color: #383;
+}
+
+.wrapper {
+  padding: 2px;
+}
