@@ -1,0 +1,9 @@
+graph TD
+Node1:type=constant[0.5]
+Node2:type=constant[8]
+Node3:density=dbin[Y]
+Node4:type=logical["step(Y-2.5)"]
+
+Node1:type=constant --> Node3:density=dbin
+Node2:type=constant --> Node3:density=dbin
+Node3:density=dbin --> Node4:type=logical
