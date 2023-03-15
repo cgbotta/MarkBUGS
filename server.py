@@ -8,13 +8,10 @@ def index():
 
 @app.route('/bugs-code/', methods=["POST"])
 def my_link():
-  dict = request.form
-  for key in dict:
-    print(key)
-    print (dict[key])
-  bugs_code = translate()
+  mermaid_code = request.form["graph-definition"]
+  bugs_code = translate(mermaid_code)
 
-  return render_template("index.html", INPUT_NAME_1 = bugs_code)
+  return render_template("index.html", INPUT_NAME_1 = bugs_code, INPUT_NAME_2 = mermaid_code)
 
 if __name__ == '__main__':
   app.run(debug=True)

@@ -47,21 +47,27 @@ def addConnection(parent, child, model_to_create):
     child_node.parents.append(parent_node)
 
     
-def translate():
+def translate(mermaid_code):
     # Array of order to create everything, add stuff to this after each line of the file is processed
     model_to_create = []
-    print(model_to_create)
 
-    file = open(file="./example_graph.txt")
-    lines = file.readlines()
+    # File method
+    # file = open(file="./example_graph.txt")
+    # lines = file.readlines()
+
+    # Split lines method
+    lines = [str.strip(line) for line in mermaid_code.splitlines()]
+    print(lines)
+    # exit()
+
 
     connections = False
     for index, line in enumerate(lines):
         # if the first line does not start with "graph" then error
+        if line == '\n' or line == '':
+            continue
         if index == 0 and not line.startswith("graph"):
             raise ValueError("The first line must start with 'graph'")
-        if line == '\n':
-            continue
         
         if index > 0:
             # Check if we have reached connections
