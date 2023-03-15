@@ -2,7 +2,7 @@
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         const config = {
-    theme: 'default',
+    theme: 'dark',
     logLevel: 'fatal',
     securityLevel: 'strict',
     startOnLoad: true,
@@ -60,7 +60,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src= /static/scripts/script.js></script>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.0/css/foundation.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.0/css/foundation.min.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mermaid/7.0.0/mermaid.dark.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -69,19 +69,22 @@
     <div class="wrapper">
         <!-- <p>Check out some <a href="http://knsv.github.io/mermaid/#things-to-be-done-in-order-to-add-a-new-diagram-type" target="_blank">demos</a> to see what you can put in the text area below.</p> -->
         <div labelFor='#graph-definition'>Graph Definition</div>
-        <textarea id="graph-definition" cols=80 rows=15>
+        <textarea id="graph-definition" name="graph-definition" form="mermaid" cols=80 rows=8>
             graph TB
             a-->b
             c-->d
         </textarea>
-        <div class="btn">
+        <!-- <div class="btn">
             <a id="render" class="button">render</a>
-        </div>
-
-        <form action="/my-link/">
-          <input type="submit" value="Click me" />
+        </div> -->
+        <form action="/bugs-code/" id="mermaid" method="post">
+          <input type="submit" value="Generate BUGS Code" class="submitButton"/>
         </form>
       
-      <button> <a href="/my-link/">Click me</a></button>
+      <!-- <button> <a href="/bugs-code/">Click me</a></button> -->
+
+      <textarea name="bugs" id="bugs" cols="30" rows="10">
+        {{INPUT_NAME_1}}
+      </textarea>
     </div>
 </body>

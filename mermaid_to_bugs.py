@@ -32,7 +32,7 @@ class connection:
 def getSubstringBetweenTwoChars(ch1,ch2,str):
     return str[str.find(ch1)+1:str.find(ch2)]
 
-def addConnection(parent, child):
+def addConnection(parent, child, model_to_create):
     parent_node = None
     child_node = None
     for component in model_to_create:
@@ -47,92 +47,93 @@ def addConnection(parent, child):
     child_node.parents.append(parent_node)
 
     
+def translate():
+    # Array of order to create everything, add stuff to this after each line of the file is processed
+    model_to_create = []
+    print(model_to_create)
 
-# Array of order to create everything, add stuff to this after each line of the file is processed
-model_to_create = []
+    file = open(file="./example_graph.txt")
+    lines = file.readlines()
 
-file = open(file="./example_graph.txt")
-lines = file.readlines()
+    connections = False
+    for index, line in enumerate(lines):
+        # if the first line does not start with "graph" then error
+        if index == 0 and not line.startswith("graph"):
+            raise ValueError("The first line must start with 'graph'")
+        if line == '\n':
+            continue
+        
+        if index > 0:
+            # Check if we have reached connections
+            if '->' in line and connections is False:
+                connections = True
+            if '->' not in line and connections is True:
+                raise ValueError("Defined node in connections section")
 
-connections = False
-for index, line in enumerate(lines):
-    # if the first line does not start with "graph" then error
-    if index == 0 and not line.startswith("graph"):
-        raise ValueError("The first line must start with 'graph'")
-    if line == '\n':
-        continue
-    
-    if index > 0:
-        # Check if we have reached connections
-        if '->' in line and connections is False:
-            connections = True
-        if '->' not in line and connections is True:
-            raise ValueError("Defined node in connections section")
-
-        if not connections:
-            # Process all the nodes
-            if '[' not in line or ']' not in line:
-                raise ValueError("Node definition does not have value")
-            
-            n = node('','')
-            node_value = getSubstringBetweenTwoChars('[',']',line)
-            if node_value.isnumeric():
-                n.value = float(node_value)
-            else:
-                n.value = node_value
-
-            # Process the name
-            n.name = line[0:line.find(':')]
-            
-            #Process the list of attributes
-            n.attributes = line[line.find(':')+1 : line.find('[')].split()
-            
-            for attribute in n.attributes:
-                attribute_pair = attribute.split('=')
+            if not connections:
+                # Process all the nodes
+                if '[' not in line or ']' not in line:
+                    raise ValueError("Node definition does not have value")
                 
-                if attribute_pair[0] == 'type':
-                    n.type = attribute_pair[1]
-                elif attribute_pair[0] == 'density':
-                    n.density = attribute_pair[1]
-                    n.type = 'stochastic'
+                n = node('','')
+                node_value = getSubstringBetweenTwoChars('[',']',line)
+                if node_value.isnumeric():
+                    n.value = float(node_value)
                 else:
-                    raise ValueError("Invalid attribute type")
+                    n.value = node_value
 
-            model_to_create.append(n)
+                # Process the name
+                n.name = line[0:line.find(':')]
+                
+                #Process the list of attributes
+                n.attributes = line[line.find(':')+1 : line.find('[')].split()
+                
+                for attribute in n.attributes:
+                    attribute_pair = attribute.split('=')
+                    
+                    if attribute_pair[0] == 'type':
+                        n.type = attribute_pair[1]
+                    elif attribute_pair[0] == 'density':
+                        n.density = attribute_pair[1]
+                        n.type = 'stochastic'
+                    else:
+                        raise ValueError("Invalid attribute type")
+
+                model_to_create.append(n)
+                print(model_to_create)
+
+            else:
+                # Process all the connections
+                if '[' in line or ']' in line:
+                    raise ValueError("Node values cannot be set in the connections section")
+                
+                parent = line[0:line.find('-->')].strip()
+                child = line[line.find('-->') + 3:len(line)].strip()
+
+                # c = connection(parent[0:parent.find(':')],child[0:child.find(':')])
+                # model_to_create.append(c)
+                parent = parent[0:parent.find(':')]
+                child = child[0:child.find(':')]
+                addConnection(parent, child, model_to_create)
+        
+    BUGS_code = ''
+    print(model_to_create)
+    for component in model_to_create:
+        # In this section, need to generate actual BUGS code
+        print(component)
+
+        if isinstance(component, node):
+            n = component
+            if n.type == 'constant':
+                BUGS_code = BUGS_code + f'{n.name} <- {n.value}\n'
+            elif n.type == 'logical':
+                BUGS_code = BUGS_code + f'{n.name} <- ({n.value})\n'
+
+            else:
+                BUGS_code = BUGS_code + f'{n.name} ~ {n.density}({n.value})\n'
+
 
         else:
-            # Process all the connections
-            if '[' in line or ']' in line:
-                raise ValueError("Node values cannot be set in the connections section")
-            
-            parent = line[0:line.find('-->')].strip()
-            child = line[line.find('-->') + 3:len(line)].strip()
+            print("Yah")
 
-            # c = connection(parent[0:parent.find(':')],child[0:child.find(':')])
-            # model_to_create.append(c)
-            parent = parent[0:parent.find(':')]
-            child = child[0:child.find(':')]
-            addConnection(parent, child)
-    
-BUGS_code = ''
-for component in model_to_create:
-    # In this section, need to generate actual BUGS code
-    print(component)
-
-    if isinstance(component, node):
-        n = component
-        if n.type == 'constant':
-            BUGS_code = BUGS_code + f'{n.name} <- {n.value}\n'
-        elif n.type == 'logical':
-            BUGS_code = BUGS_code + f'{n.name} <- ({n.value})\n'
-
-        else:
-            BUGS_code = BUGS_code + f'{n.name} ~ {n.density}({n.value})\n'
-
-
-    else:
-        print("Yah")
-
-# print(BUGS_code)
-    
-
+    return BUGS_code
