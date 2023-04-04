@@ -1,0 +1,24 @@
+design 1:
+graph TD
+Node1:type=constant[0.5]
+Node2:type=constant[8]
+Node3:density=dbin[Y]; Node3:type=stochastic[dbin]
+Node4:type=logical[step]
+
+Node1, Node2 --> Node3
+Node3 --> Node4
+
+design 2: 
+Node1:type=constant[0.5], Node2:type=constant[8] --> Node3:stochastic=[dbin]
+Node3 --> Node4:type=logical[step]
+
+design 3: 
+Node1:type=constant[0.5]
+Node2:type=constant[8]
+Node1, Node2--> Node3:stochastic=[dbin]
+Node3 --> Node4:type=logical[step]
+
+Node1:constant[0.5]
+Node2:constant[8]
+Node1, Node2--> Node3:stochastic[dbin]
+Node3 --> Node4:logical[step]

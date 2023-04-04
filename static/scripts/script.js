@@ -26,26 +26,53 @@ $(function() {
         graph.setAttribute("id", "graph-div");
         document.body.appendChild(graph);
         graph.innerHTML = svgCode;
-        console.log(svgCode);
+        // console.log(svgCode);
     };
 
     let graphDiv = document.querySelector("#graph-definition");
     let render = document.querySelector("#render");
     let status = document.querySelector('[labelFor="#graph-definition"]');
+    // let mermaid_code = document.querySelector("#mermaid_code");
 
     function renderGraph() {
-        console.log('about to decode');
+        // console.log('about to decode');
         var graphDefinition = decodeEntities(document.querySelector("#graph-definition").value);
         
         try {
             document.querySelector("#graph-div").remove();
-            console.log("deleting old svg wrapper element");
+            // console.log("deleting old svg wrapper element");
         } catch (e) {
-            console.log("no existing graph found");
+            // console.log("no existing graph found");
         }
 
         // mermaid.init();
-        console.log(graphDefinition);
+        // console.log(graphDefinition);
+
+        if (mermaid.parse(graphDefinition)) {
+            status.classList.remove('error');
+            status.classList.add('ok');
+        }
+        else {
+            status.classList.add('error');
+            status.classList.remove('ok');
+        }
+
+        var graph = mermaidAPI.render("graph-diagram", graphDefinition, insertSvg);
+    }
+
+    function renderGraph_v2() {
+        // console.log('about to decode');
+        var graphDefinition = decodeEntities(document.querySelector("#mermaid_code").value);
+        
+        try {
+            document.querySelector("#graph-div").remove();
+            // console.log("deleting old svg wrapper element");
+        } catch (e) {
+            // console.log("no existing graph found");
+        }
+
+        // mermaid.init();
+        // console.log(graphDefinition);
 
         if (mermaid.parse(graphDefinition)) {
             status.classList.remove('error');
@@ -67,7 +94,7 @@ $(function() {
     }
 
     renderGraph();
-    graphDiv.addEventListener("change", renderGraph);
-    graphDiv.addEventListener("keyup", delayRendering);
-    render.addEventListener("click", renderGraph);
+    // graphDiv.addEventListener("change", renderGraph);
+    // graphDiv.addEventListener("keyup", delayRendering);
+    render.addEventListener("click", renderGraph_v2);
 });

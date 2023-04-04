@@ -1,7 +1,13 @@
 # define an object called node_constant that has a value and a name
+import collections.abc
+
+node_dict = {}
 
 # TODO make all the fields align with what they are called in DoodleBUGS
 # TODO start processing from the end []   
+
+
+
 class node:
     def __init__(self, name, value):
         self.name = name
@@ -9,8 +15,10 @@ class node:
         self.attributes = []
         self.type = None #TODO could make this a predefined enum or something
         self.density = None #TODO this one too 
+        self.function = None #TODO and this one
         self.parents = []
         self.children = []
+        self.name_only = False
     def __str__(self):
         rtn = f"Name: {self.name}\nValue: {self.value}\nType: {self.type}\nDensity: {self.density}\n"
         rtn = rtn + 'Parents: '
@@ -30,6 +38,8 @@ class connection:
         return f"Parent: {self.parent}\nChild: {self.child}\n\n"
 
 def getSubstringBetweenTwoChars(ch1,ch2,str):
+    if '[' not in str or ']' not in str:
+        return None
     return str[str.find(ch1)+1:str.find(ch2)]
 
 def addConnection(parent, child, model_to_create):
@@ -46,8 +56,24 @@ def addConnection(parent, child, model_to_create):
     parent_node.children.append(child_node)
     child_node.parents.append(parent_node)
 
+def identify_connections(to_process):
+    if len(to_process) == 1:
+        return [[str.strip(n) for n in to_process[0].split(',')]]
+    elif len(to_process) == 2:
+        nodes = []
+        parents = [str.strip(n) for n in to_process[0].split(',')]
+        children = [str.strip(n) for n in to_process[1].split(',')]
+        if len(parents) > 1 and len(children) > 1:
+            raise ValueError("Cannot have multiple nodes on both sides of connection")
+        for parent in parents:
+            for child in children:
+                nodes.append([parent, child])
+        return nodes
+    else:
+        raise ValueError("Invalid number of components")
+
     
-def translate(mermaid_code):
+def translate_v1(mermaid_code):
     # Array of order to create everything, add stuff to this after each line of the file is processed
     model_to_create = []
 
@@ -109,7 +135,7 @@ def translate(mermaid_code):
                 print(model_to_create)
 
             else:
-                # Process all the connections
+                # Process all the connections 
                 if '[' in line or ']' in line:
                     raise ValueError("Node values cannot be set in the connections section")
                 
@@ -122,7 +148,7 @@ def translate(mermaid_code):
                 child = child[0:child.find(':')]
                 addConnection(parent, child, model_to_create)
         
-    BUGS_code = ''
+    BUGS_code = 'model {\n'
     print(model_to_create)
     for component in model_to_create:
         # In this section, need to generate actual BUGS code
@@ -141,5 +167,178 @@ def translate(mermaid_code):
 
         else:
             print("Yah")
-
+    BUGS_code = BUGS_code + '}'
     return BUGS_code
+
+def update_graph(n: node):
+    if n.name_only:
+        return
+    else:
+        node_dict[n.name] = n
+
+# TODO what I am trying to do it a put against a database, essentially. Should probably check each thing that I am updating
+def parse_node(node_str : str):
+    n = node('','')
+
+    no_name = False
+    no_attributes = False
+
+    if node_str.find(':') == -1:
+        no_attributes = True
+        n.name = node_str
+    else:
+        n.name = node_str[0:node_str.find(':')]
+
+    # try to load existing node
+    if n.name in node_dict:
+        n = node_dict[n.name]
+
+    value = getSubstringBetweenTwoChars('[',']',node_str)
+    if value is None:
+        no_name = True
+    elif value.isnumeric():
+        n.value = float(value)
+    else:
+        n.value = value
+
+    # Process the name
+    if node_str.find(':') == -1:
+        no_attributes = True
+    else:
+        #Process the list of attributes
+        n.attributes = node_str[node_str.find(':')+1 : node_str.find('[')].split()
+
+        # TODO should move this to beginning, then see if the syntax and fuinction options are correct for the given type
+        for attribute in n.attributes:        
+            if attribute == 'constant':
+                n.type = 'constant'
+            elif attribute == 'logical':
+                n.type = 'logical'
+                n.function = n.value
+            elif attribute == 'stochastic':
+                n.type = 'stochastic'
+                n.density = n.value
+            else:
+                raise ValueError("Invalid attribute: ", attribute)
+    
+    if no_name and no_attributes:
+        n.name_only = True
+
+    return n
+    
+def create_nodes(array_of_nodes: str):
+    if len(array_of_nodes) == 2:
+        # This is a connection
+        parent = parse_node(array_of_nodes[0])
+        child = parse_node(array_of_nodes[1])
+
+        if child not in parent.children:
+            parent.children.append(child)
+        if parent not in child.parents:
+            child.parents.append(parent)
+
+        return[parent, child]
+        
+    elif len(array_of_nodes) == 1:
+        # This is simply a node, might want to do this to everyting
+        return [parse_node(array_of_nodes[0])]
+
+    else:
+        raise ValueError("Internal Server Error: Only Nodes and Connections are allowed types")
+
+# Translate input from Design 3 into BUGS
+def translate_v2(mermaid_code):
+    # Array of order to create everything, add stuff to this after each line of the file is processed
+    nodes_to_process = []
+
+    lines = [str.strip(line) for line in mermaid_code.splitlines()]
+    
+    for index, line in enumerate(lines):
+        # Skip blank lines
+        if line == '\n' or line == '':
+            continue
+        to_process = [line]
+        if '->' in line:
+            # Split into 2 halves to process
+            to_process = [str.strip(piece) for piece in line.split('-->')] 
+        # TODO send to function to return final array with all connections specified
+        next_batch = identify_connections(to_process)
+        for x in next_batch:
+            nodes_to_process.append(x)
+    print(nodes_to_process)
+
+    #TODO now need to iterate over nodes_to_process and create the actual node objects with connections
+    print("nodes_to_process",nodes_to_process)
+    for element in nodes_to_process:
+        node_objects = create_nodes(element)
+        for node_update in node_objects:
+            update_graph(node_update)
+    
+    for key, value in node_dict.items():
+        print(key, value)
+            
+
+    BUGS_code = 'model {\n'
+    for node_name, node_object in node_dict.items():
+        if isinstance(node_object, node):
+            n = node_object
+        else:
+            raise ValueError("Internal Server Error: Node is only accepted type")
+        
+        if n.type == 'constant':
+            BUGS_code = BUGS_code + f'{n.name} <- {n.value}\n'
+        elif n.type == 'logical':
+            if len(n.parents) == 0:
+                BUGS_code = BUGS_code + f'{n.name} <- ({n.value})\n'
+            else:
+                if n.function == 'step':
+                    if len(n.parents) == 1:
+                        BUGS_code = BUGS_code + f'{n.name} <- step({n.parents[0].name})\n'
+                    else:
+                        raise ValueError(f"step requires 1 parent, recieved {len(n.parents)}")
+                else:
+                    raise ValueError(f"Invalid logical function: {n.function}")
+        elif n.type == 'stochastic':
+            if len(n.parents) == 0:
+                # TODO ??
+                BUGS_code = BUGS_code + f'{n.name} <- ({n.value})\n'
+            else:
+                if n.density == 'dbin':
+                    # Takes 2 arguments
+                    if len(n.parents) == 2:
+                        BUGS_code = BUGS_code + f'{n.name} <- dbin({n.parents[0].value},{n.parents[1].value})\n'
+                    else:
+                        raise ValueError(f"dbin requires 2 parents, recieved {len(n.parents)}")
+
+                else:
+                    raise ValueError(f"Invalid stochastic function: {n.density}")
+
+
+    BUGS_code = BUGS_code + '}'
+    return BUGS_code
+
+def generate_mermaid():
+    mermaid_code = 'graph TD\n'
+
+    # # Process all nodes
+    # for key, value in node_dict.items():
+    #     mermaid_code = mermaid_code + f'{key}[{value.value}]\n'
+
+    # # Process all connections
+    # for key, value in node_dict.items():
+    #     for child in value.children:
+    #         mermaid_code = mermaid_code + f'{key}[{value.value}] --> {child.name}[{child.value}]\n'
+
+
+    # Another version
+    # Process all nodes
+    for key, value in node_dict.items():
+        mermaid_code = mermaid_code + f'{key}\n'
+
+    # Process all connections
+    for key, value in node_dict.items():
+        for child in value.children:
+            mermaid_code = mermaid_code + f'{key} --> {child.name}\n'
+
+
+    return mermaid_code

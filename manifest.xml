@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="TaskPaneApp">
   <!--IMPORTANT! Id must be unique for each add-in. If you copy this manifest ensure that you change this id to your own GUID. -->
-  <Id>95cb5dee-9f70-45ec-9562-b7d321dc8790</Id>
+  <Id>95cb5dee-9f70-45ec-9562-b7d321dc8789</Id>
   <Version>1.0</Version>
   <ProviderName>Cambridge CBL</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
@@ -12,7 +12,7 @@
     <AppDomain>"TODO"</AppDomain>
   </AppDomains>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://polite-sprinkles-c650b2.netlify.app" />
+    <SourceLocation DefaultValue="https://cgb45.pythonanywhere.com" />
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
 </OfficeApp>
