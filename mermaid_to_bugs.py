@@ -306,14 +306,23 @@ def translate_v2(mermaid_code):
                 for toktype, tokval, st, end, _ in g:
                     if tokval.isidentifier():
                         possible_variables.append(tokval)
+                print("possible_variables", possible_variables)
+
                 for token in possible_variables:
                     if token in BUILT_IN_FUNCTIONS:
                         possible_variables.remove(token)
+                print("possible_variables", possible_variables)
+
                 if len(n.parents) != len(possible_variables):
                     raise ValueError(f"Number of parents does not equal number of variables in child: {n.parents} != {possible_variables}")
                 updated_value = n.value
+                print("updated value", updated_value)
                 for index, val in enumerate(possible_variables):
-                    updated_value.replace(val, n.parents[index].name)
+                    print("val", val)
+                    print("parent", n.parents[index].name)
+                    updated_value = updated_value.replace(val, n.parents[index].name)
+                print("updated value", updated_value)
+
                 BUGS_code = BUGS_code + f'{n.name} <- ({updated_value})\n'
 
                 # else:
