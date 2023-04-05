@@ -1,11 +1,19 @@
 # define an object called node_constant that has a value and a name
 import collections.abc
+from tokenize import tokenize
+from io import BytesIO
+from keyword import iskeyword
+
 
 node_dict = {}
 
 # TODO make all the fields align with what they are called in DoodleBUGS
 # TODO start processing from the end []   
 
+
+BUILT_IN_FUNCTIONS = [
+    "step"
+]
 
 
 class node:
@@ -291,13 +299,25 @@ def translate_v2(mermaid_code):
             if len(n.parents) == 0:
                 BUGS_code = BUGS_code + f'{n.name} <- ({n.value})\n'
             else:
-                if n.function == 'step':
-                    if len(n.parents) == 1:
-                        BUGS_code = BUGS_code + f'{n.name} <- step({n.parents[0].name})\n'
-                    else:
-                        raise ValueError(f"step requires 1 parent, recieved {len(n.parents)}")
-                else:
-                    raise ValueError(f"Invalid logical function: {n.function}")
+                # if n.function == 'step':
+                    # Identify possible variables to replace
+                g = tokenize(BytesIO(n.value.encode("utf-8")).readline)
+                possible_variables = []
+                for toktype, tokval, st, end, _ in g:
+                    if tokval.isidentifier():
+                        possible_variables.append(tokval)
+                for token in possible_variables:
+                    if token in BUILT_IN_FUNCTIONS:
+                        possible_variables.remove(token)
+                if len(n.parents) != len(possible_variables):
+                    raise ValueError(f"Number of parents does not equal number of variables in child: {n.parents} != {possible_variables}")
+                updated_value = n.value
+                for index, val in enumerate(possible_variables):
+                    updated_value.replace(val, n.parents[index].name)
+                BUGS_code = BUGS_code + f'{n.name} <- ({updated_value})\n'
+
+                # else:
+                #     raise ValueError(f"Invalid logical function: {n.function}")
         elif n.type == 'stochastic':
             if len(n.parents) == 0:
                 # TODO ??
