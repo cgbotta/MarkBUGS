@@ -21,4 +21,21 @@ Node3 --> Node4:type=logical[step]
 Node1:constant[0.5]
 Node2:constant[8]
 Node1, Node2--> Node3:stochastic[dbin]
-Node3 --> Node4:logical[step]
+Node3 --> Node4:logical[step(Y - 2.5)]
+
+
+loop example in mermaid:
+
+flowchart TD
+    A[dbern 1]
+    subgraph for i in 1:3
+    p[logical statement ]
+        
+    end
+
+
+loop example in MarkBUGS:
+
+for i in 1:3
+
+end

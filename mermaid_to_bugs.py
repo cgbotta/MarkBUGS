@@ -80,104 +80,6 @@ def identify_connections(to_process):
     else:
         raise ValueError("Invalid number of components")
 
-    
-def translate_v1(mermaid_code):
-    # Array of order to create everything, add stuff to this after each line of the file is processed
-    model_to_create = []
-
-    # File method
-    # file = open(file="./example_graph.txt")
-    # lines = file.readlines()
-
-    # Split lines method
-    lines = [str.strip(line) for line in mermaid_code.splitlines()]
-    print(lines)
-    # exit()
-
-
-    connections = False
-    for index, line in enumerate(lines):
-        # if the first line does not start with "graph" then error
-        if line == '\n' or line == '':
-            continue
-        if index == 0 and not line.startswith("graph"):
-            raise ValueError("The first line must start with 'graph'")
-        
-        if index > 0:
-            # Check if we have reached connections
-            if '->' in line and connections is False:
-                connections = True
-            if '->' not in line and connections is True:
-                raise ValueError("Defined node in connections section")
-
-            if not connections:
-                # Process all the nodes
-                if '[' not in line or ']' not in line:
-                    raise ValueError("Node definition does not have value")
-                
-                n = node('','')
-                node_value = getSubstringBetweenTwoChars('[',']',line)
-                if node_value.isnumeric():
-                    n.value = float(node_value)
-                else:
-                    n.value = node_value
-
-                # Process the name
-                n.name = line[0:line.find(':')]
-                
-                #Process the list of attributes
-                n.attributes = line[line.find(':')+1 : line.find('[')].split()
-                
-                for attribute in n.attributes:
-                    attribute_pair = attribute.split('=')
-                    
-                    if attribute_pair[0] == 'type':
-                        n.type = attribute_pair[1]
-                    elif attribute_pair[0] == 'density':
-                        n.density = attribute_pair[1]
-                        n.type = 'stochastic'
-                    else:
-                        raise ValueError("Invalid attribute type")
-
-                model_to_create.append(n)
-                print(model_to_create)
-
-            else:
-                # Process all the connections 
-                if '[' in line or ']' in line:
-                    raise ValueError("Node values cannot be set in the connections section")
-                
-                parent = line[0:line.find('-->')].strip()
-                child = line[line.find('-->') + 3:len(line)].strip()
-
-                # c = connection(parent[0:parent.find(':')],child[0:child.find(':')])
-                # model_to_create.append(c)
-                parent = parent[0:parent.find(':')]
-                child = child[0:child.find(':')]
-                addConnection(parent, child, model_to_create)
-        
-    BUGS_code = 'model {\n'
-    print(model_to_create)
-    for component in model_to_create:
-        # In this section, need to generate actual BUGS code
-        print(component)
-
-        if isinstance(component, node):
-            n = component
-            if n.type == 'constant':
-                BUGS_code = BUGS_code + f'{n.name} <- {n.value}\n'
-            elif n.type == 'logical':
-                BUGS_code = BUGS_code + f'{n.name} <- ({n.value})\n'
-
-            else:
-                BUGS_code = BUGS_code + f'{n.name} ~ {n.density}({n.value})\n'
-
-
-        else:
-            print("Yah")
-    BUGS_code = BUGS_code + '}'
-    return BUGS_code
-
 def update_graph(n: node):
     if n.name_only:
         return
@@ -323,7 +225,7 @@ def translate_v2(mermaid_code):
                     updated_value = updated_value.replace(val, n.parents[index].name)
                 print("updated value", updated_value)
 
-                BUGS_code = BUGS_code + f'{n.name} <- ({updated_value})\n'
+                BUGS_code = BUGS_code + f'{n.name} <- {updated_value}\n'
 
                 # else:
                 #     raise ValueError(f"Invalid logical function: {n.function}")
@@ -338,7 +240,12 @@ def translate_v2(mermaid_code):
                         BUGS_code = BUGS_code + f'{n.name} <- dbin({n.parents[0].value},{n.parents[1].value})\n'
                     else:
                         raise ValueError(f"dbin requires 2 parents, recieved {len(n.parents)}")
-
+                elif n.density == 'dbern':
+                    # Takes 1 argument
+                    if len(n.parents) == 1:
+                        BUGS_code = BUGS_code + f'{n.name} <- dbern({n.parents[0].name})\n'
+                    else:
+                        raise ValueError(f"dbern requires 1 parent, recieved {len(n.parents)}")
                 else:
                     raise ValueError(f"Invalid stochastic function: {n.density}")
 
@@ -371,3 +278,7 @@ def generate_mermaid():
 
 
     return mermaid_code
+
+def clear_all_data():
+    node_dict.clear()
+    return

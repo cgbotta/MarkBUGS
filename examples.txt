@@ -1,0 +1,26 @@
+EXAMPLE 1: https://www.mrc-bsu.cam.ac.uk/software/bugs/the-bugs-project-the-bugs-book/bugs-book-exercises/the-bugs-book-exercises-ch-2-coin-tossing-solution/
+
+MarkBUGS Code
+
+Node1:constant[0.5]
+Node2:constant[20]
+Node1, Node2--> Node3:stochastic[dbin]
+Node3 --> Node4:logical[step(Y - 14.5)]
+
+
+EXAMPLE 2: https://www.mrc-bsu.cam.ac.uk/software/bugs/the-bugs-project-the-bugs-book/bugs-book-exercises/the-bugs-book-exercises-ch-3-hiv-test-solutions/
+
+MarkBUGS Code
+
+B:constant[1]
+indicator:constant[0.001] --> A:stochastic[dbern]
+p:logical[0.95*A + 0.02*(1 – A) ] --> C:stochastic[dbern]
+
+OR
+
+B:constant[1]
+indicator:constant[0.001] --> A:stochastic[dbern]
+p:logical[0.95*A + 0.02*(1 – A) ]
+C:stochastic[dbern]
+p --> C
+

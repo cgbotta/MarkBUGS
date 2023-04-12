@@ -75,11 +75,14 @@
         <!-- <div class="btn">
             <a id="render" class="btn">render</a>
         </div> -->
-        <input type="submit" value="Render Graph" id="render" class="submitButton"/>
+
+        <br><br>
 
         <form action="/bugs-code/" id="mermaid" method="post">
           <input type="submit" value="Generate BUGS Code" class="submitButton"/>
         </form>
+
+        <br><br>
 
 
 
@@ -90,7 +93,24 @@
 
       <textarea name="mermaid_code" id="mermaid_code" cols="30" rows="10">{{INPUT_NAME_3}}</textarea>
 
-      <input type="submit" value="Clear Data" id="clear_data" class="submitButton"/>
+      <br><br>
+      <input type="submit" value="Render Graph" id="render" class="submitButton"/>
+      <br><br>
+      <br><br>
+
+      <form action="/example/1" id="example" method="get">
+        <input type="submit" value="Load Example 1" class="submitButton"/>
+      </form>
+
+      <form action="/example/2" id="example" method="get">
+        <input type="submit" value="Load Example 2" class="submitButton"/>
+      </form>
+
+      <br><br><br>
+
+      <form action="/clear-data/" id="clear_data" method="post">
+        <input type="submit" value="Clear Data" class="submitButton"/>
+      </form>
 
     </div>
     </div>
