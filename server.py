@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 from mermaid_to_bugs import translate_v2, generate_mermaid, clear_all_data
+from os import getcwd
 app = Flask(__name__)
 
 @app.route('/')
@@ -27,6 +28,7 @@ def get_example(id):
   file_contents = ""
   try:
     print(id)
+    print(getcwd())
     f = open(f'./examples/study_example_{id}.txt', 'r')
     file_contents = f.read()
   except Exception as e:
