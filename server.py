@@ -29,8 +29,8 @@ def get_example(id):
     print(id)
     f = open(f'./examples/study_example_{id}.txt', 'r')
     file_contents = f.read()
-  except:
-    print("error")
+  except Exception as e:
+    print("error: ", e)
   return render_template("index.html", INPUT_NAME_2 = file_contents)
 
 
