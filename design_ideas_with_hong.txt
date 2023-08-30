@@ -34,8 +34,33 @@ flowchart TD
     end
 
 
-loop example in MarkBUGS:
+loop options in MarkBUGS:
 
+option1:
 for i in 1:3
 
 end
+
+option2:
+for i in 1:3{
+
+}
+
+
+
+list options in MarkBUGS:
+Node1:list
+
+
+
+
+
+
+
+
+
+
+
+
+
+

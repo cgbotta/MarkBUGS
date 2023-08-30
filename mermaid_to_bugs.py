@@ -86,7 +86,7 @@ def update_graph(n: node):
     else:
         node_dict[n.name] = n
 
-# TODO what I am trying to do it a put against a database, essentially. Should probably check each thing that I am updating
+# TODO what I am trying to do is a put against a database, essentially. Should probably check each thing that I am updating
 def parse_node(node_str : str):
     n = node('','')
 
@@ -118,7 +118,7 @@ def parse_node(node_str : str):
         #Process the list of attributes
         n.attributes = node_str[node_str.find(':')+1 : node_str.find('[')].split()
 
-        # TODO should move this to beginning, then see if the syntax and fuinction options are correct for the given type
+        # TODO should move this to beginning, then see if the syntax and function options are correct for the given type
         for attribute in n.attributes:        
             if attribute == 'constant':
                 n.type = 'constant'
